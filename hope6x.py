@@ -624,27 +624,64 @@ elif page == "B. Cleaning tool":
                 st.success(f"Applied mapping to '{mapping_col}'. Changed {changed} values.")
                 st.rerun()
 
-           
-           # 4. One-hot encoding
-                            
-            st.markdown("**4. One-hot encoding (optional)**")
-            st.warning("⚠️ This will permanently delete the original column and add multiple new columns.")
 
-            if st.button("One-hot encode selected column", type="primary"):
+               st.markdown("**4. One-hot encoding (optional)**")
+            
+            # Добавляем выбор конкретной колонки именно для этого действия
+            oh_col = st.selectbox(
+                "Select column for One-hot encoding",
+                options=cat_cols,
+                key="oh_encode_col_select" # Уникальный ключ, чтобы не конфликтовать с другими селектами
+            )
+            
+            st.warning(f"⚠️ This will permanently delete the original column '{oh_col}' and add multiple new binary columns.")
+            
+            if st.button("Apply One-hot encoding", type="primary"):
+                # Сохраняем копию для Preview
                 before_df = df.copy()
-                one_hot = pd.get_dummies(df[selected_cat_col], prefix=selected_cat_col, prefix_sep="_")
-                df = pd.concat([df.drop(columns=[selected_cat_col]), one_hot], axis=1)
-
+                
+                # Создаем дамми-переменные (числовые 0 и 1)
+                # Используем именно выбранную колонку oh_col
+                one_hot = pd.get_dummies(df[oh_col], prefix=oh_col, prefix_sep="_")
+                
+                # Удаляем старую колонку и присоединяем новые
+                df = pd.concat([df.drop(columns=[oh_col]), one_hot], axis=1)
+            
+                # Сохраняем состояние
                 st.session_state.df_working = df
                 st.session_state.transform_log.append({
                     "step": "one_hot_encoding",
-                    "column": selected_cat_col,
+                    "column": oh_col,
                     "new_columns": list(one_hot.columns),
                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                 })
+                
+                # Показываем результат и обновляем страницу
                 show_preview(before_df, df, "One-hot encoding")
-                st.success(f"One-hot encoded '{selected_cat_col}'. Original column deleted. Added {len(one_hot.columns)} new columns.")
+                st.success(f"One-hot encoded '{oh_col}'. Added {len(one_hot.columns)} new columns.")
                 st.rerun()
+
+        
+           # # 4. One-hot encoding
+                            
+           #  st.markdown("**4. One-hot encoding (optional)**")
+           #  st.warning("⚠️ This will permanently delete the original column and add multiple new columns.")
+
+           #  if st.button("One-hot encode selected column", type="primary"):
+           #      before_df = df.copy()
+           #      one_hot = pd.get_dummies(df[selected_cat_col], prefix=selected_cat_col, prefix_sep="_")
+           #      df = pd.concat([df.drop(columns=[selected_cat_col]), one_hot], axis=1)
+
+           #      st.session_state.df_working = df
+           #      st.session_state.transform_log.append({
+           #          "step": "one_hot_encoding",
+           #          "column": selected_cat_col,
+           #          "new_columns": list(one_hot.columns),
+           #          "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+           #      })
+           #      show_preview(before_df, df, "One-hot encoding")
+           #      st.success(f"One-hot encoded '{selected_cat_col}'. Original column deleted. Added {len(one_hot.columns)} new columns.")
+           #      st.rerun()
 
 
 
