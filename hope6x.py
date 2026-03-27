@@ -625,7 +625,7 @@ elif page == "B. Cleaning tool":
                 st.rerun()
 
 
-               st.markdown("**4. One-hot encoding (optional)**")
+            st.markdown("**4. One-hot encoding (optional)**")
             
             # Добавляем выбор конкретной колонки именно для этого действия
             oh_col = st.selectbox(
@@ -659,7 +659,7 @@ elif page == "B. Cleaning tool":
                 # Показываем результат и обновляем страницу
                 show_preview(before_df, df, "One-hot encoding")
                 st.success(f"One-hot encoded '{oh_col}'. Added {len(one_hot.columns)} new columns.")
-                st.rerun()
+                st.rerun()  
 
         
            # # 4. One-hot encoding
