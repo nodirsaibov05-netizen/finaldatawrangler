@@ -213,9 +213,9 @@ elif page == "B. Cleaning tool":
                 st.dataframe(after_df.head(3))
 
         # Transformation log display
-        with st.expander("Transformation Log (last 10 steps)", expanded=False):
+        with st.expander("Transformation Log (last 20 steps)", expanded=False):
             if st.session_state.transform_log:
-                log_df = pd.DataFrame(st.session_state.transform_log[-10:])
+                log_df = pd.DataFrame(st.session_state.transform_log[-20:])
                 st.dataframe(log_df, use_container_width=True)
             else:
                 st.info("No transformations yet.")
@@ -1502,9 +1502,9 @@ elif page == "D. Export & Report":
         
         st.caption(f"Total actions recorded: {len(st.session_state.transform_log)}")
         
-        # Показ последних 10 действий
-        st.subheader("📋 Last 10 Actions")
-        recent_log = log_df.tail(10).iloc[::-1]   
+        # Last 20 actions
+        st.subheader("📋 Last 20 Actions")
+        recent_log = log_df.tail(20).iloc[::-1]   
         st.dataframe(
             recent_log,
             use_container_width=True,
