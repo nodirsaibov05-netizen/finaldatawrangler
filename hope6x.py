@@ -993,25 +993,25 @@ elif page == "B. Cleaning tool":
 
 
                 # ====================== DATA PREVIEW IN CLEANING PAGE ======================
-            st.divider()
-            st.subheader("📊 Current Dataset Preview")
-            st.caption("Live view of the data after all cleaning operations")
-        
-            if st.button("Show first 500 rows", type="primary", key="show_500_cleaning"):
-                st.dataframe(
-                    st.session_state.df_working.head(500),
-                    use_container_width=True
-                )
-            else:
-                st.info("Click the button above to preview the first 500 rows of the current cleaned dataset.")
-        
-            # Дополнительно: небольшая статистика
-            df_current = st.session_state.df_working
-            col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Rows", f"{len(df_current):,}")
-            col2.metric("Columns", df_current.shape[1])
-            col3.metric("Missing Values", f"{df_current.isna().sum().sum():,}")
-            col4.metric("Duplicates", len(df_current) - len(df_current.drop_duplicates()))
+        st.divider()
+        st.subheader("📊 Current Dataset Preview")
+        st.caption("Live view of the data after all cleaning operations")
+    
+        if st.button("Show first 500 rows", type="primary", key="show_500_cleaning"):
+            st.dataframe(
+                st.session_state.df_working.head(500),
+                use_container_width=True
+            )
+        else:
+            st.info("Click the button above to preview the first 500 rows of the current cleaned dataset.")
+    
+        # Дополнительно: небольшая статистика
+        df_current = st.session_state.df_working
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Rows", f"{len(df_current):,}")
+        col2.metric("Columns", df_current.shape[1])
+        col3.metric("Missing Values", f"{df_current.isna().sum().sum():,}")
+        col4.metric("Duplicates", len(df_current) - len(df_current.drop_duplicates()))
 
 elif page == "C. Dashboards":
     st.title("C. Dashboards Studio")
