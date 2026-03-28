@@ -14,7 +14,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Немного кастомизации (опционально)
+
 st.markdown("""
     <style>
     .stButton>button {width: 100%;}
@@ -22,18 +22,16 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ────────────────────────────────────────────────
-#  Session state initialization
-# ────────────────────────────────────────────────
+# Session state initialization
+
 if "df_original" not in st.session_state:
     st.session_state.df_original = None
     st.session_state.df_working = None
     st.session_state.transform_log = []
     st.session_state.file_name = None
 
-# ────────────────────────────────────────────────
-#  Sidebar navigation
-# ────────────────────────────────────────────────
+# Sidebar navigation
+
 st.sidebar.title("Data Wrangler")
 page = st.sidebar.radio("Go to", [
     "A. Overview",
@@ -47,23 +45,22 @@ if st.sidebar.button("🔄 Reset everything", type="primary"):
         del st.session_state[key]
     st.rerun()
 
-# ────────────────────────────────────────────────
 #  Page A — Upload & Overview
-# ────────────────────────────────────────────────
+
 if page == "A. Overview":
 
     st.title("A. Overview")
 
     st.markdown(
         "Upload your file in one of the following formats: **CSV**, **Excel (.xlsx)** or **JSON**.\n"
-        "For coursework requirements, datasets should ideally have ≥ 1000 rows and ≥ 8 columns."
+        "Datasets should ideally have ≥ 1000 rows and ≥ 8 columns."
     )
 
-    # Выбор разделителя для CSV (показываем всегда)
+    # Choose the CSV separator
     separator = st.selectbox(
         "CSV delimiter (separator)",
         options=[", (comma)", "; (semicolon)", "\\t (tab)", "| (pipe)", "space"],
-        index=1,  # по умолчанию semicolon
+        index=1,  
         help="Choose the character that separates columns in your CSV file"
     )
 
@@ -170,9 +167,8 @@ if page == "A. Overview":
         if st.button("Show first 500 rows"):
             st.dataframe(df.head(500), use_container_width=True)
 
-# ────────────────────────────────────────────────
 #  Page B — Cleaning & Preparation
-# ────────────────────────────────────────────────
+
 elif page == "B. Cleaning tool":
     st.title("B. Cleaning & Preparation Studio")
 
@@ -217,7 +213,7 @@ elif page == "B. Cleaning tool":
                 st.dataframe(after_df.head(3))
 
         # Transformation log display
-        with st.expander("Transformation Log (last 5 steps)", expanded=False):
+        with st.expander("Transformation Log (last 10 steps)", expanded=False):
             if st.session_state.transform_log:
                 log_df = pd.DataFrame(st.session_state.transform_log[-10:])
                 st.dataframe(log_df, use_container_width=True)
@@ -228,8 +224,8 @@ elif page == "B. Cleaning tool":
 
         
                 
-                # 4.1 Missing Values (Null Handling)
-                # 4.1 Missing Values (Null Handling)
+                
+        # 4.1 Missing Values (Null Handling)
         with st.expander("4.1 Missing Values (Null Handling)", expanded=True):
             st.subheader("Missing Values Handling")
 
@@ -256,7 +252,7 @@ elif page == "B. Cleaning tool":
             if action != "Do nothing":
                 numeric_cols = df.select_dtypes(include="number").columns.tolist()
 
-                # Динамический выбор колонок
+                
                 if action == "Fill with statistic (mean / median / mode)":
                     stat_method = st.selectbox("Statistic", ["mean", "median", "mode"])
                     available_cols = numeric_cols if stat_method in ["mean", "median"] else df.columns.tolist()
@@ -265,7 +261,7 @@ elif page == "B. Cleaning tool":
 
                 selected_cols = st.multiselect("Select columns to apply action to", available_cols)
 
-                # Threshold только для Drop columns
+                
                 threshold = None
                 if action == "Drop columns with > X% missing":
                     threshold = st.slider("Threshold (%) - drop columns with missing above this value", 
@@ -327,7 +323,7 @@ elif page == "B. Cleaning tool":
                         "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                     })
 
-                    # Простой Before/After preview
+                    
                     st.markdown(f"### 📊 Preview: {action}")
                     c1, c2 = st.columns(2)
                     with c1:
@@ -346,7 +342,7 @@ elif page == "B. Cleaning tool":
 
 
 
-               # 4.2 Duplicates
+            # 4.2 Duplicates
         with st.expander("4.2 Duplicates", expanded=False):
             st.subheader("Duplicate Detection & Removal")
 
@@ -392,7 +388,7 @@ elif page == "B. Cleaning tool":
                             "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                         })
 
-                        # Показываем Before / After
+                        
                         st.markdown(f"### 📊 Preview: Remove duplicates")
                         c1, c2 = st.columns(2)
                         with c1:
@@ -405,7 +401,7 @@ elif page == "B. Cleaning tool":
                             st.dataframe(df.head(10), use_container_width=True)
 
                         st.success(f"Removed {removed} duplicate rows")
-                        # st.rerun()  ← Убрали, чтобы превью осталось видимым
+                        # st.rerun()  
 
             # Show duplicate groups
             if st.button("Show duplicate groups (first 10 rows)"):
@@ -427,23 +423,23 @@ elif page == "B. Cleaning tool":
         with st.expander("4.3 Data Types & Parsing", expanded=False):
             st.subheader("Change column type")
 
-            # Сначала выбираем желаемый тип
+            
             desired_type = st.selectbox(
                 "Desired type",
                 ["numeric", "categorical", "datetime"],
                 index=0
             )
 
-            # Динамически фильтруем доступные колонки в зависимости от типа
+            
             if desired_type == "numeric":
                 available_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
-                help_text = "Только текстовые столбцы (object/category) — будут очищены от $, запятых и пробелов"
+                help_text = "Only text columns (object/category) — will be cleared of $, commas and spaces."
             elif desired_type == "categorical":
                 available_cols = df.columns.tolist()
-                help_text = "Любой столбец → преобразуется в category (экономит память)"
+                help_text = "Any column → is converted to category (saves memory)"
             elif desired_type == "datetime":
                 available_cols = df.columns.tolist()
-                help_text = "Любой столбец → пытаемся распарсить как дату"
+                help_text = "Parse any column → as a date"
 
             col_to_change = st.selectbox(
                 "Select column to convert",
@@ -452,15 +448,15 @@ elif page == "B. Cleaning tool":
                 help=help_text
             )
 
-            # Если колонка выбрана — показываем действия
+            # If the column is selected, we show the actions
             if col_to_change:
                 if desired_type == "numeric":
                     if st.button("Convert to numeric (clean dirty strings)", type="primary"):
                         try:
-                            # Очистка типичных "грязных" символов
+                            # Cleaning up typical "dirty" characters
                             cleaned = df[col_to_change].astype(str).replace(
-                                r'[\$,€£¥ ]', '', regex=True  # $, €, £, ¥, пробелы
-                            ).str.replace(',', '.', regex=False)  # запятая → точка для десятичных
+                                r'[\$,€£¥ ]', '', regex=True  # $, €, £, ¥, spaces
+                            ).str.replace(',', '.', regex=False)  # comma → period for decimals
 
                             df[col_to_change] = pd.to_numeric(cleaned, errors='coerce')
                             invalid_count = df[col_to_change].isna().sum()
@@ -497,7 +493,7 @@ elif page == "B. Cleaning tool":
                     date_format = st.text_input(
                         "Datetime format (optional, e.g. %Y-%m-%d or %d/%m/%Y)",
                         value="",
-                        help="Оставьте пустым для автоматического распознавания"
+                        help="Leave it blank for automatic recognition."
                     )
                     if st.button("Convert to datetime", type="primary"):
                         try:
@@ -523,12 +519,11 @@ elif page == "B. Cleaning tool":
 
 
 
-               # 4.4 Categorical Data Tools
-                # 4.4 Categorical Data Tools
+        # 4.4 Categorical Data Tools
         with st.expander("4.4 Categorical Data Tools", expanded=False):
             st.subheader("Categorical Data Tools")
 
-            # Общий выбор колонки для большинства операций
+            # General column selection for most operations
             cat_cols = df.select_dtypes(include=["object", "category"]).columns.tolist()
             if not cat_cols:
                 st.warning("No categorical columns found in the dataset.")
@@ -587,7 +582,7 @@ elif page == "B. Cleaning tool":
                 st.success(f"Grouped {len(rare)} rare categories into 'Other'")
                 st.rerun()
 
-            # 3. Value Mapping — отдельный выбор колонки
+            # 3. Value Mapping — separate column selection
             st.markdown("**3. Value mapping / replacement**")
             mapping_col = st.selectbox(
                 "Select column for mapping",
@@ -627,27 +622,26 @@ elif page == "B. Cleaning tool":
 
             st.markdown("**4. One-hot encoding (optional)**")
             
-            # Добавляем выбор конкретной колонки именно для этого действия
             oh_col = st.selectbox(
                 "Select column for One-hot encoding",
                 options=cat_cols,
-                key="oh_encode_col_select" # Уникальный ключ, чтобы не конфликтовать с другими селектами
+                key="oh_encode_col_select" # A unique key so as not to conflict with other selections
             )
             
             st.warning(f"⚠️ This will permanently delete the original column '{oh_col}' and add multiple new binary columns.")
             
             if st.button("Apply One-hot encoding", type="primary"):
-                # Сохраняем копию для Preview
+                # Saving a copy for Preview
                 before_df = df.copy()
                 
-                # Создаем дамми-переменные (числовые 0 и 1)
-                # Используем именно выбранную колонку oh_col
+                # Creating dummy variables (numeric 0 and 1)
+                # Using the selected oh_col column
                 one_hot = pd.get_dummies(df[oh_col], prefix=oh_col, prefix_sep="_")
                 
-                # Удаляем старую колонку и присоединяем новые
+                # Delete the old column and add new ones
                 df = pd.concat([df.drop(columns=[oh_col]), one_hot], axis=1)
             
-                # Сохраняем состояние
+                # Saving the state
                 st.session_state.df_working = df
                 st.session_state.transform_log.append({
                     "step": "one_hot_encoding",
@@ -656,37 +650,16 @@ elif page == "B. Cleaning tool":
                     "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                 })
                 
-                # Показываем результат и обновляем страницу
+                # Show the result and refresh the page.
                 show_preview(before_df, df, "One-hot encoding")
                 st.success(f"One-hot encoded '{oh_col}'. Added {len(one_hot.columns)} new columns.")
                 st.rerun()  
 
         
-           # # 4. One-hot encoding
-                            
-           #  st.markdown("**4. One-hot encoding (optional)**")
-           #  st.warning("⚠️ This will permanently delete the original column and add multiple new columns.")
-
-           #  if st.button("One-hot encode selected column", type="primary"):
-           #      before_df = df.copy()
-           #      one_hot = pd.get_dummies(df[selected_cat_col], prefix=selected_cat_col, prefix_sep="_")
-           #      df = pd.concat([df.drop(columns=[selected_cat_col]), one_hot], axis=1)
-
-           #      st.session_state.df_working = df
-           #      st.session_state.transform_log.append({
-           #          "step": "one_hot_encoding",
-           #          "column": selected_cat_col,
-           #          "new_columns": list(one_hot.columns),
-           #          "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
-           #      })
-           #      show_preview(before_df, df, "One-hot encoding")
-           #      st.success(f"One-hot encoded '{selected_cat_col}'. Original column deleted. Added {len(one_hot.columns)} new columns.")
-           #      st.rerun()
+    
 
 
-
-
-                        # 4.5 Numeric Cleaning (Outliers)
+        # 4.5 Numeric Cleaning (Outliers)
                         
         with st.expander("4.5 Numeric Cleaning (Outliers)", expanded=False):
             st.subheader("Outlier Detection & Handling")
@@ -759,7 +732,7 @@ elif page == "B. Cleaning tool":
 
         
                 
-                # 4.6 Normalization / Scaling
+                
                 # 4.6 Normalization / Scaling
         with st.expander("4.6 Normalization / Scaling", expanded=False):
             st.subheader("Normalization and Scaling")
@@ -810,7 +783,7 @@ elif page == "B. Cleaning tool":
                             "timestamp": datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
                         })
 
-                        # Показываем Before / After Statistics БЕЗ rerun
+                        
                         st.markdown("### 📊 Before / After Statistics")
 
                         stats_before = before_df[cols_to_scale].describe().round(4)
@@ -826,10 +799,10 @@ elif page == "B. Cleaning tool":
 
                         st.success(success_msg)
 
-                    # Если scaling уже был применён ранее — показываем статистику
+                    # If scaling has already been applied before, we show statistics.
                     elif st.session_state.get("last_scaling_cols") == cols_to_scale:
                         st.markdown("### 📊 Before / After Statistics (last scaling)")
-                        # Здесь можно добавить сохранение before_df, но для простоты показываем текущую статистику
+                        
 
        
         # 4.7 Column Operations
@@ -952,7 +925,7 @@ elif page == "B. Cleaning tool":
         with st.expander("4.8 Data Validation Rules", expanded=False):
             st.subheader("Data Validation Rules")
 
-            # Инициализация хранилища нарушений (если ещё нет)
+            # Initializing the violation repository (if not already)
             if "validation_results" not in st.session_state:
                 st.session_state.validation_results = pd.DataFrame()
 
@@ -998,7 +971,7 @@ elif page == "B. Cleaning tool":
                     st.session_state.validation_results = violations
                     st.success(f"Found {len(violations)} rows with missing values")
 
-            # ====================== VIOLATIONS TABLE ======================
+            # Violations Table
             st.divider()
             st.subheader("Violations Table")
 
@@ -1006,7 +979,7 @@ elif page == "B. Cleaning tool":
                 st.info("No violations detected yet. Run a validation rule above.")
             else:
                 st.dataframe(st.session_state.validation_results, use_container_width=True)
-                # Кнопка скачивания нарушений
+                # Download violations button
                 csv_violations = st.session_state.validation_results.to_csv(index=False).encode('utf-8')
                 st.download_button(
                     label="📥 Download Violations Table (CSV)",
@@ -1016,6 +989,7 @@ elif page == "B. Cleaning tool":
                 )
 
             st.caption("This table shows all rows that violate the defined rules.")
+
 elif page == "C. Dashboards":
     st.title("C. Dashboards Studio")
 
@@ -1496,7 +1470,7 @@ elif page == "D. Export & Report":
     
     
    
-    # ====================== DOWNLOAD TRANSFORMATION LOG ======================
+    # Donwload Transformation log
     st.subheader("📥 Download Transformation Log")
     
     if st.session_state.transform_log:
@@ -1505,7 +1479,7 @@ elif page == "D. Export & Report":
         col1, col2 = st.columns(2)
         
         with col1:
-            # Скачивание в CSV (самый надёжный вариант)
+            
             csv_log = log_df.to_csv(index=False).encode('utf-8')
             st.download_button(
                 label="📄 Download Full Transformation Log (CSV)",
@@ -1516,7 +1490,7 @@ elif page == "D. Export & Report":
             )
         
         with col2:
-            # Скачивание в JSON
+            
             json_log = log_df.to_json(orient="records", indent=2).encode('utf-8')
             st.download_button(
                 label="📝 Download Full Transformation Log (JSON)",
@@ -1530,7 +1504,7 @@ elif page == "D. Export & Report":
         
         # Показ последних 10 действий
         st.subheader("📋 Last 10 Actions")
-        recent_log = log_df.tail(10).iloc[::-1]   # последние действия сверху
+        recent_log = log_df.tail(10).iloc[::-1]   
         st.dataframe(
             recent_log,
             use_container_width=True,
@@ -1541,9 +1515,6 @@ elif page == "D. Export & Report":
         st.info("No transformations performed yet.")
     
     st.divider()
-    # ====================== КОНЕЦ БЛОКА ЛОГА ======================
-    
-    
     
     
     # Basic statistics
