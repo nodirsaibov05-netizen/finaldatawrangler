@@ -219,7 +219,7 @@ elif page == "B. Cleaning tool":
         # Transformation log display
         with st.expander("Transformation Log (last 5 steps)", expanded=False):
             if st.session_state.transform_log:
-                log_df = pd.DataFrame(st.session_state.transform_log[-5:])
+                log_df = pd.DataFrame(st.session_state.transform_log[-10:])
                 st.dataframe(log_df, use_container_width=True)
             else:
                 st.info("No transformations yet.")
@@ -1511,4 +1511,36 @@ elif page == "D. Export & Report":
             'Missing': df.isnull().sum(),
             'Missing %': (df.isnull().sum() / len(df) * 100).round(1)
         })
-        st.dataframe(col_info)    
+        st.dataframe(col_info)
+
+
+
+    st.divider()
+    st.subheader("📥 Download Transformation Log")
+    
+    if st.session_state.transform_log:
+        log_df = pd.DataFrame(st.session_state.transform_log)
+        
+        # Скачивание в CSV
+        csv_log = log_df.to_csv(index=False).encode('utf-8')
+        st.download_button(
+            label="📄 Download Full Transformation Log (CSV)",
+            data=csv_log,
+            file_name="transformation_log.csv",
+            mime="text/csv",
+            use_container_width=True
+        )
+        
+        # Скачивание в Markdown (более читаемый формат)
+        md_log = log_df.to_markdown(index=False)
+        st.download_button(
+            label="📝 Download Transformation Log (Markdown)",
+            data=md_log.encode('utf-8'),
+            file_name="transformation_log.md",
+            mime="text/markdown",
+            use_container_width=True
+        )
+        
+        st.caption(f"Total actions recorded: {len(st.session_state.transform_log)}")
+    else:
+        st.info("No transformations to export yet.")
