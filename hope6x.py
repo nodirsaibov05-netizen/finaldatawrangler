@@ -1493,6 +1493,59 @@ elif page == "D. Export & Report":
 )
     st.divider()
     
+    
+    
+   
+    # ====================== DOWNLOAD TRANSFORMATION LOG ======================
+    st.subheader("📥 Download Transformation Log")
+    
+    if st.session_state.transform_log:
+        log_df = pd.DataFrame(st.session_state.transform_log)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            # Скачивание в CSV (самый надёжный вариант)
+            csv_log = log_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+                label="📄 Download Full Transformation Log (CSV)",
+                data=csv_log,
+                file_name="transformation_log.csv",
+                mime="text/csv",
+                use_container_width=True
+            )
+        
+        with col2:
+            # Скачивание в JSON
+            json_log = log_df.to_json(orient="records", indent=2).encode('utf-8')
+            st.download_button(
+                label="📝 Download Full Transformation Log (JSON)",
+                data=json_log,
+                file_name="transformation_log.json",
+                mime="application/json",
+                use_container_width=True
+            )
+        
+        st.caption(f"Total actions recorded: {len(st.session_state.transform_log)}")
+        
+        # Показ последних 10 действий
+        st.subheader("📋 Last 10 Actions")
+        recent_log = log_df.tail(10).iloc[::-1]   # последние действия сверху
+        st.dataframe(
+            recent_log,
+            use_container_width=True,
+            hide_index=True
+        )
+        
+    else:
+        st.info("No transformations performed yet.")
+    
+    st.divider()
+    # ====================== КОНЕЦ БЛОКА ЛОГА ======================
+    
+    
+    
+    
     # Basic statistics
     st.subheader("📊 Summary Statistics")
     
@@ -1515,32 +1568,4 @@ elif page == "D. Export & Report":
 
 
 
-    st.divider()
-    st.subheader("📥 Download Transformation Log")
     
-    if st.session_state.transform_log:
-        log_df = pd.DataFrame(st.session_state.transform_log)
-        
-        # Скачивание в CSV
-        csv_log = log_df.to_csv(index=False).encode('utf-8')
-        st.download_button(
-            label="📄 Download Full Transformation Log (CSV)",
-            data=csv_log,
-            file_name="transformation_log.csv",
-            mime="text/csv",
-            use_container_width=True
-        )
-        
-        # Скачивание в Markdown (более читаемый формат)
-        md_log = log_df.to_markdown(index=False)
-        st.download_button(
-            label="📝 Download Transformation Log (Markdown)",
-            data=md_log.encode('utf-8'),
-            file_name="transformation_log.md",
-            mime="text/markdown",
-            use_container_width=True
-        )
-        
-        st.caption(f"Total actions recorded: {len(st.session_state.transform_log)}")
-    else:
-        st.info("No transformations to export yet.")
